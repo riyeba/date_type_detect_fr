@@ -48,10 +48,44 @@ function Register() {
     }
   };
 
+  const compressImage = (file, callback) => {
+    const image = new Image();
+    image.src = URL.createObjectURL(file);
+
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const maxWidth = 800;
+      const scaleSize = maxWidth / image.width;
+      canvas.width = maxWidth;
+      canvas.height = image.height * scaleSize;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            callback(compressedFile, URL.createObjectURL(blob));
+          }
+        },
+        "image/jpeg",
+        0.7
+      );
+    };
+  };
+
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    setImagePreview(URL.createObjectURL(selectedFile));
+    if (!selectedFile) return;
+
+    compressImage(selectedFile, (compressed, previewUrl) => {
+      setFile(compressed);
+      setImagePreview(previewUrl);
+    });
   };
 
   const SubmitForm = (e) => {
@@ -110,8 +144,12 @@ function Register() {
                 onDrop={(e) => {
                   e.preventDefault();
                   const droppedFile = e.dataTransfer.files[0];
-                  setFile(droppedFile);
-                  setImagePreview(URL.createObjectURL(droppedFile));
+                  if (droppedFile) {
+                    compressImage(droppedFile, (compressed, previewUrl) => {
+                      setFile(compressed);
+                      setImagePreview(previewUrl);
+                    });
+                  }
                 }}
                 onDragOver={(e) => e.preventDefault()}
               >
@@ -122,7 +160,9 @@ function Register() {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <p className="text-gray-500">Image preview will appear here</p>
+                  <p className="text-gray-500">
+                    Image preview will appear here
+                  </p>
                 )}
               </div>
 
