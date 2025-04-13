@@ -19,7 +19,6 @@ function Register() {
         alert("Please upload a valid image file (jpg, png, gif)");
         return false;
       }
-
       if (file.size > 2 * 1024 * 1024) {
         alert("Uploaded file size should be less than 2MB");
         return false;
@@ -28,17 +27,16 @@ function Register() {
     return true;
   };
 
-  async function Submit() {
-    if (!validateForm()) return;
-    if (!imagePreview) return;
+  const Submit = async () => {
+    if (!validateForm() || !imagePreview) return;
 
     setLoading(true);
-    const formdata = new FormData();
-    if (file) formdata.append("file", file);
+    const formData = new FormData();
+    if (file) formData.append("file", file);
 
     try {
       const PostPrediction = "https://backend-saudi-date.onrender.com/predicts";
-      const response = await axios.post(PostPrediction, formdata);
+      const response = await axios.post(PostPrediction, formData);
       if (response.status === 200) {
         setData(response.data);
         setShowResult(true);
@@ -48,18 +46,18 @@ function Register() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const handleFileSelect = (event) => {
-    const selectedFile = event.target.files[0];
+  const handleFileSelect = (e) => {
+    const selectedFile = e.target.files[0];
     setFile(selectedFile);
     setImagePreview(URL.createObjectURL(selectedFile));
   };
 
-  function SubmitForm(e) {
+  const SubmitForm = (e) => {
     e.preventDefault();
     Submit();
-  }
+  };
 
   const handleClear = (e) => {
     e.preventDefault();
@@ -74,21 +72,19 @@ function Register() {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat absolute inset-0 bg-black bg-opacity-100 "
+      className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `url('https://www.leaders-mena.com/leaders/uploads/2024/08/PM9IkFTQ.png')`,
-       
-        
+        backgroundImage: `url('https://thumbs.dreamstime.com/b/palm-tree-dates-10248972.jpg?w=768')`,
       }}
     >
-      <div className="flex items-center justify-center min-h-screen bg-opacity-50">
-        <div className=" p-8 rounded-lg shadow-xl max-w-lg w-full">
-          <h2 className="text-3xl font-bold text-center mb-6 text-blue-900">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="p-8 rounded-lg shadow-xl max-w-lg w-full bg-white bg-opacity-90 backdrop-blur-sm">
+          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
             Type of Date Fruit Detector
           </h2>
           <form onSubmit={SubmitForm}>
             <div className="mb-4">
-              <label className="block text-lg font-semibold text-blue-300">
+              <label className="block text-lg font-semibold text-blue-600">
                 Upload Date Image
               </label>
 
@@ -96,21 +92,21 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current.click()}
-                  className="flex-1 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-700 transition duration-300"
+                  className="flex-1 py-2 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition duration-300"
                 >
                   Take Photo
                 </button>
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current.click()}
-                  className="flex-1 py-2 bg-stone-700 text-white font-semibold rounded-lg hover:bg-stone-700 transition duration-300"
+                  className="flex-1 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition duration-300"
                 >
                   Choose from Gallery
                 </button>
               </div>
 
               <div
-                className="w-full h-40 border-dashed border-4 border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"
+                className="w-full h-40 border-dashed border-4 border-gray-300 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden"
                 onDrop={(e) => {
                   e.preventDefault();
                   const droppedFile = e.dataTransfer.files[0];
@@ -126,9 +122,7 @@ function Register() {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <p className="text-white">
-                    Image preview will appear here
-                  </p>
+                  <p className="text-gray-500">Image preview will appear here</p>
                 )}
               </div>
 
@@ -153,7 +147,7 @@ function Register() {
               {!showResult ? (
                 <button
                   type="submit"
-                  className="w-full py-2 bg-blue-500 text-white font-semibold cursor-pointer rounded-lg hover:bg-blue-600 transition duration-300"
+                  className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
                   disabled={loading}
                 >
                   {loading ? "Loading..." : "Submit"}
@@ -175,13 +169,12 @@ function Register() {
               <h3 className="text-xl font-semibold text-gray-700">
                 Prediction Result
               </h3>
-              <p className="mt-2 text-gray-600">
-                <strong>Predicted Class:</strong>{" "}
-                <strong>{data.class}</strong>
+              <p className="mt-2 text-gray-700">
+                <strong>Predicted Class:</strong> {data.class}
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-700">
                 <strong>Confidence Level:</strong>{" "}
-                <strong>{(data.confidence * 100).toFixed(1)}%</strong>
+                {(data.confidence * 100).toFixed(1)}%
               </p>
             </div>
           )}
