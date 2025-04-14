@@ -35,7 +35,7 @@ function Register() {
     if (file) formData.append("file", file);
 
     try {
-      const PostPrediction = "https://backend-saudi-date.onrender.com/predicts";
+      const PostPrediction = "https://backend-saudi-date.onrender.com/predict";
       const response = await axios.post(PostPrediction, formData);
       if (response.status === 200) {
         setData(response.data);
